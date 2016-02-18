@@ -29,28 +29,28 @@ public class Manager {
     public static void create(){
         manager = new AssetManager();
         batch = new SpriteBatch();
-        font = new BitmapFont(Gdx.files.internal("assets/kenvector_future_thin.fnt"));
+        font = new BitmapFont(Gdx.files.internal("kenvector_future_thin.fnt"));
     }
 
     public static void load(){
-        manager.load("assets/blue.png", Texture.class);
-        manager.load("assets/bgm.mp3", Music.class);
+        manager.load("blue.png", Texture.class);
+        manager.load("bgm.mp3", Music.class);
 
-        manager.load("assets/sprites.txt", TextureAtlas.class);
+        manager.load("sprites.txt", TextureAtlas.class);
 
         manager.finishLoading();
     }
 
     public static void done(){
-        bgPlay = manager.get("assets/blue.png", Texture.class);
+        bgPlay = manager.get("blue.png", Texture.class);
         bgPlay.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
-        bgm = manager.get("assets/bgm.mp3", Music.class);
+        bgm = manager.get("bgm.mp3", Music.class);
         bgm.setVolume(0.5f);
         bgm.setLooping(true);
 
         playerShipFrames = new Array<TextureRegion>();
         for(int i = 0; i < 4; i++)
-            playerShipFrames.add(new TextureRegion(manager.get("assets/sprites.txt", TextureAtlas.class).findRegion("playerShip"), i*64, 0, 64, 64));
+            playerShipFrames.add(new TextureRegion(manager.get("sprites.txt", TextureAtlas.class).findRegion("playerShip"), i*64, 0, 64, 64));
         playerShipAnimation = new Animation(0.1f, playerShipFrames);
         playerShipAnimation.setPlayMode(Animation.PlayMode.LOOP);
     }
