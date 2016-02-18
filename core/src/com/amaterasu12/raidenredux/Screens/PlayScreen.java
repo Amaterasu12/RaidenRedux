@@ -1,11 +1,14 @@
 package com.amaterasu12.raidenredux.Screens;
 
+import com.amaterasu12.raidenredux.Components.PositionComponent;
 import com.amaterasu12.raidenredux.Components.VelocityComponent;
-import com.amaterasu12.raidenredux.Entities.Entities;
+import com.amaterasu12.raidenredux.Systems.CleanupSystem;
+import com.amaterasu12.raidenredux.Tools.Entities;
 import com.amaterasu12.raidenredux.RaidenRedux;
 import com.amaterasu12.raidenredux.Systems.MovementSystem;
 import com.amaterasu12.raidenredux.Systems.RenderingSystem;
 import com.amaterasu12.raidenredux.Tools.Manager;
+import com.amaterasu12.raidenredux.Tools.Tools;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -20,10 +23,15 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  */
 public class PlayScreen implements Screen {
     //constants and variables
-    public static float playTime;
+    public static float playTime = 0;
     private final int BG_SCROLL_SPEED = 50;
     private final float PLAYER_MOVE_SPEED = 300;
-    private float bgY;
+    private final float PLAYER_BULLET_FREQUENCY = Gdx.graphics.getDeltaTime()*5;
+    private final float PLAYER_BULLET_VELOCITY = 600f;
+    private float bulletElapsedTime = 0;
+    private float bgY = 0;
+    private VelocityComponent playerVel;
+    private PositionComponent playerPos;
 
     //cameras
     private final RaidenRedux game;
@@ -33,80 +41,97 @@ public class PlayScreen implements Screen {
     //systems
     private RenderingSystem renderingSystem;
     private MovementSystem movementSystem;
+    private CleanupSystem cleanupSystem;
 
     //player entity
     private Entity playerShip;
 
     public PlayScreen(RaidenRedux gam) {
-        playTime = 0;
-        game = gam;
+        this.game = gam;
         playCamera = new OrthographicCamera();
-        playCamera.setToOrtho(false, 480, 800);
+        playCamera.setToOrtho(false, RaidenRedux.W_WIDTH, RaidenRedux.W_HEIGHT);
         gamePort = new FitViewport(RaidenRedux.W_WIDTH, RaidenRedux.W_HEIGHT, playCamera);
-        playCamera.position.set(gamePort.getWorldWidth()/2, gamePort.getWorldHeight()/2, 0);
+        playCamera.position.set(gamePort.getWorldWidth() / 2, gamePort.getWorldHeight() / 2, 0);
         //systems
         renderingSystem = new RenderingSystem();
         movementSystem = new MovementSystem();
+        cleanupSystem = new CleanupSystem();
 
         //add systems
         RaidenRedux.engine.addSystem(renderingSystem);
         RaidenRedux.engine.addSystem(movementSystem);
-
-        //bg scroll variables
-        bgY = 0;
+        RaidenRedux.engine.addSystem(cleanupSystem);
 
         //create ships
         playerShip = Entities.createPlayer();
         RaidenRedux.engine.addEntity(playerShip);
+        playerVel = playerShip.getComponent(VelocityComponent.class);
+        playerPos = playerShip.getComponent(PositionComponent.class);
+
     }
 
     @Override
     public void show() {
+        playTime = 0;
         Manager.bgm.play();
     }
 
     public void update(float delta){
         playTime += delta;
+        playerVel = playerShip.getComponent(VelocityComponent.class);
+        playerPos = playerShip.getComponent(PositionComponent.class);
+
+        //spawn player bullets
+        bulletElapsedTime += delta;
+        if(bulletElapsedTime >= PLAYER_BULLET_FREQUENCY){
+            RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x-10, playerPos.y+10, Entities.PLAYER_BULLET_Z, 0, PLAYER_BULLET_VELOCITY));
+            RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x+10, playerPos.y+10, Entities.PLAYER_BULLET_Z, 0, PLAYER_BULLET_VELOCITY));
+            bulletElapsedTime = 0;
+        }
 
         handleInput(delta);
+
         //update bg position
         bgY -= BG_SCROLL_SPEED * Gdx.graphics.getDeltaTime();
     }
 
     public void handleInput(float delta){
-        VelocityComponent playerVel = playerShip.getComponent(VelocityComponent.class);
-        if(Gdx.input.isKeyPressed(Input.Keys.UP)){
+
+        int edgePadding = 32;
+        Tools.DIRECTION xBoundCheck = Tools.outOfBoundsX(playerPos, edgePadding);
+        Tools.DIRECTION yBoundCheck = Tools.outOfBoundsY(playerPos, edgePadding);
+        if(Gdx.input.isKeyPressed(Input.Keys.UP) && (yBoundCheck != Tools.DIRECTION.UP)){
             playerVel.y = PLAYER_MOVE_SPEED;
-            if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
+            if(Gdx.input.isKeyPressed(Input.Keys.LEFT) && (xBoundCheck != Tools.DIRECTION.LEFT))
                 playerVel.x = -PLAYER_MOVE_SPEED;
-            else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+            else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) && (xBoundCheck != Tools.DIRECTION.RIGHT))
                 playerVel.x = PLAYER_MOVE_SPEED;
             else
                 playerVel.x = 0;
         }
-        else if(Gdx.input.isKeyPressed(Input.Keys.DOWN)){
+        else if(Gdx.input.isKeyPressed(Input.Keys.DOWN) && (yBoundCheck != Tools.DIRECTION.DOWN)){
             playerVel.y = -PLAYER_MOVE_SPEED;
-            if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
+            if(Gdx.input.isKeyPressed(Input.Keys.LEFT) && (xBoundCheck != Tools.DIRECTION.LEFT))
                 playerVel.x = -PLAYER_MOVE_SPEED;
-            else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))
+            else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) && (xBoundCheck != Tools.DIRECTION.RIGHT))
                 playerVel.x = PLAYER_MOVE_SPEED;
             else
                 playerVel.x = 0;
         }
-        else if(Gdx.input.isKeyPressed(Input.Keys.LEFT)){
+        else if(Gdx.input.isKeyPressed(Input.Keys.LEFT) && (xBoundCheck != Tools.DIRECTION.LEFT)){
             playerVel.x = -PLAYER_MOVE_SPEED;
-            if(Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            if(Gdx.input.isKeyPressed(Input.Keys.DOWN) && (yBoundCheck != Tools.DIRECTION.DOWN))
                 playerVel.y = -PLAYER_MOVE_SPEED;
-            else if(Gdx.input.isKeyPressed(Input.Keys.UP))
+            else if(Gdx.input.isKeyPressed(Input.Keys.UP) && (yBoundCheck != Tools.DIRECTION.UP))
                 playerVel.y = PLAYER_MOVE_SPEED;
             else
                 playerVel.y = 0;
         }
-        else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)){
+        else if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) && (xBoundCheck != Tools.DIRECTION.RIGHT)){
             playerVel.x = PLAYER_MOVE_SPEED;
-            if(Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            if(Gdx.input.isKeyPressed(Input.Keys.DOWN) && (yBoundCheck != Tools.DIRECTION.DOWN))
                 playerVel.y = -PLAYER_MOVE_SPEED;
-            else if(Gdx.input.isKeyPressed(Input.Keys.UP))
+            else if(Gdx.input.isKeyPressed(Input.Keys.UP) && (yBoundCheck != Tools.DIRECTION.UP))
                 playerVel.y = PLAYER_MOVE_SPEED;
             else
                 playerVel.y = 0;
@@ -125,7 +150,7 @@ public class PlayScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         Manager.batch.setProjectionMatrix(playCamera.combined);
         Manager.batch.begin();
-        Manager.batch.draw(Manager.bgPlay, 0, 0, 0, Math.round(bgY), 480, 800);
+        Manager.batch.draw(Manager.bgPlay, 0, 0, 0, Math.round(bgY), RaidenRedux.W_WIDTH, RaidenRedux.W_HEIGHT);
         Manager.batch.end();
 
         update(delta);
@@ -158,4 +183,6 @@ public class PlayScreen implements Screen {
     public void dispose() {
 
     }
+
+
 }

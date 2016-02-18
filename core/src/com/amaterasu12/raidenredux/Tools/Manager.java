@@ -3,6 +3,7 @@ package com.amaterasu12.raidenredux.Tools;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -16,6 +17,8 @@ import com.badlogic.gdx.utils.Array;
  * Created by Carl on 2/17/2016.
  */
 public class Manager {
+    public static final float MUSIC_VOLUME = 0.5f;
+    public static final float SOUND_VOLUME = 0.7f;
     public static SpriteBatch batch;
     public static BitmapFont font;
     public static AssetManager manager;
@@ -25,27 +28,33 @@ public class Manager {
 
     public static Animation playerShipAnimation;
     public static Array<TextureRegion> playerShipFrames;
+    public static Texture phasor01;
+    public static Texture phasor02;
 
+    public static Sound phasorSound01;
     public static void create(){
         manager = new AssetManager();
         batch = new SpriteBatch();
-        font = new BitmapFont(Gdx.files.internal("kenvector_future_thin.fnt"));
+        font = new BitmapFont(Gdx.files.internal("KenFont.fnt"));
     }
 
     public static void load(){
-        manager.load("blue.png", Texture.class);
+        manager.load("purple.png", Texture.class);
         manager.load("bgm.mp3", Music.class);
 
         manager.load("sprites.txt", TextureAtlas.class);
+        manager.load("laserRed06.png", Texture.class);
+        manager.load("laserGreen04.png", Texture.class);
 
+        manager.load("sfx_laser1.ogg", Sound.class);
         manager.finishLoading();
     }
 
     public static void done(){
-        bgPlay = manager.get("blue.png", Texture.class);
+        bgPlay = manager.get("purple.png", Texture.class);
         bgPlay.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
         bgm = manager.get("bgm.mp3", Music.class);
-        bgm.setVolume(0.5f);
+        bgm.setVolume(MUSIC_VOLUME);
         bgm.setLooping(true);
 
         playerShipFrames = new Array<TextureRegion>();
@@ -53,6 +62,10 @@ public class Manager {
             playerShipFrames.add(new TextureRegion(manager.get("sprites.txt", TextureAtlas.class).findRegion("playerShip"), i*64, 0, 64, 64));
         playerShipAnimation = new Animation(0.1f, playerShipFrames);
         playerShipAnimation.setPlayMode(Animation.PlayMode.LOOP);
+        phasor01 = manager.get("laserRed06.png");
+        phasor02 = manager.get("laserGreen04.png");
+
+        phasorSound01 = manager.get("sfx_laser1.ogg", Sound.class);
     }
 
     public static void dispose(){

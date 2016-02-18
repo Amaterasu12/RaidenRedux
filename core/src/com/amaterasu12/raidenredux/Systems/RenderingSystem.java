@@ -2,6 +2,7 @@ package com.amaterasu12.raidenredux.Systems;
 
 import com.amaterasu12.raidenredux.Components.PositionComponent;
 import com.amaterasu12.raidenredux.Components.RenderableComponent;
+import com.amaterasu12.raidenredux.RaidenRedux;
 import com.amaterasu12.raidenredux.Screens.PlayScreen;
 import com.amaterasu12.raidenredux.Tools.Manager;
 import com.badlogic.ashley.core.ComponentMapper;
@@ -34,7 +35,7 @@ public class RenderingSystem extends SortedIteratingSystem {
         pm = ComponentMapper.getFor(PositionComponent.class);
 
         cam = new OrthographicCamera();
-        cam.setToOrtho(false, 480, 800);
+        cam.setToOrtho(false, RaidenRedux.W_WIDTH, RaidenRedux.W_HEIGHT);
         cam.position.set(PlayScreen.gamePort.getWorldWidth() / 2, PlayScreen.gamePort.getWorldHeight() / 2, 0);
     }
 
