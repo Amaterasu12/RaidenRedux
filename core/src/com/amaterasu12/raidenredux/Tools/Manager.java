@@ -4,8 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.utils.Array;
+
 
 /**
  * Created by Carl on 2/17/2016.
@@ -18,6 +23,9 @@ public class Manager {
     public static Texture bgPlay;
     public static Music bgm;
 
+    public static Animation playerShipAnimation;
+    public static Array<TextureRegion> playerShipFrames;
+
     public static void create(){
         manager = new AssetManager();
         batch = new SpriteBatch();
@@ -27,6 +35,9 @@ public class Manager {
     public static void load(){
         manager.load("assets/blue.png", Texture.class);
         manager.load("assets/bgm.mp3", Music.class);
+
+        manager.load("assets/sprites.txt", TextureAtlas.class);
+
         manager.finishLoading();
     }
 
@@ -36,6 +47,12 @@ public class Manager {
         bgm = manager.get("assets/bgm.mp3", Music.class);
         bgm.setVolume(0.5f);
         bgm.setLooping(true);
+
+        playerShipFrames = new Array<TextureRegion>();
+        for(int i = 0; i < 4; i++)
+            playerShipFrames.add(new TextureRegion(manager.get("assets/sprites.txt", TextureAtlas.class).findRegion("playerShip"), i*64, 0, 64, 64));
+        playerShipAnimation = new Animation(0.1f, playerShipFrames);
+        playerShipAnimation.setPlayMode(Animation.PlayMode.LOOP);
     }
 
     public static void dispose(){

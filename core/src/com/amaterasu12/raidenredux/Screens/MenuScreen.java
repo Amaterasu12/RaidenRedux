@@ -4,9 +4,10 @@ import com.amaterasu12.raidenredux.RaidenRedux;
 import com.amaterasu12.raidenredux.Tools.Manager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
  * Created by Carl on 2/17/2016.
@@ -14,11 +15,14 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 public class MenuScreen implements Screen {
     private final RaidenRedux game;
     private OrthographicCamera menuCamera;
+    private Viewport viewPort;
 
     public MenuScreen(RaidenRedux gam) {
         game = gam;
         menuCamera = new OrthographicCamera();
         menuCamera.setToOrtho(false, 480, 800);
+        viewPort = new FitViewport(RaidenRedux.W_WIDTH, RaidenRedux.W_HEIGHT, menuCamera);
+        menuCamera.position.set(viewPort.getWorldWidth() / 2, viewPort.getWorldHeight() / 2, 0);
     }
 
     @Override
@@ -57,7 +61,7 @@ public class MenuScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        viewPort.update(width, height);
     }
 
     @Override
