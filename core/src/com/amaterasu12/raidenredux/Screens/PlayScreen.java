@@ -15,6 +15,8 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
@@ -43,8 +45,12 @@ public class PlayScreen implements Screen {
     private MovementSystem movementSystem;
     private CleanupSystem cleanupSystem;
 
+    //box2d
+    public static World world;
+
+
     //player entity
-    private Entity playerShip;
+    public Entity playerShip;
 
     public PlayScreen(RaidenRedux gam) {
         this.game = gam;
@@ -61,6 +67,9 @@ public class PlayScreen implements Screen {
         RaidenRedux.engine.addSystem(renderingSystem);
         RaidenRedux.engine.addSystem(movementSystem);
         RaidenRedux.engine.addSystem(cleanupSystem);
+
+        //box2d
+        world = new World(new Vector2(0, 0), true);
 
         //create ships
         playerShip = Entities.createPlayer();
@@ -86,6 +95,10 @@ public class PlayScreen implements Screen {
         if(bulletElapsedTime >= PLAYER_BULLET_FREQUENCY){
             RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x-10, playerPos.y+10, Entities.PLAYER_BULLET_Z, 0, PLAYER_BULLET_VELOCITY));
             RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x+10, playerPos.y+10, Entities.PLAYER_BULLET_Z, 0, PLAYER_BULLET_VELOCITY));
+            RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x-25, playerPos.y+10, Entities.PLAYER_BULLET_Z, -150, PLAYER_BULLET_VELOCITY));
+            RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x+25, playerPos.y+10, Entities.PLAYER_BULLET_Z, 150, PLAYER_BULLET_VELOCITY));
+            RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x-40, playerPos.y+10, Entities.PLAYER_BULLET_Z, -300, PLAYER_BULLET_VELOCITY));
+            RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x+40, playerPos.y+10, Entities.PLAYER_BULLET_Z, 300, PLAYER_BULLET_VELOCITY));
             bulletElapsedTime = 0;
         }
 
@@ -156,7 +169,7 @@ public class PlayScreen implements Screen {
         update(delta);
         RaidenRedux.engine.update(delta);
 
-
+        world.step(1 / 45f, 10, 10);
     }
 
     @Override
@@ -181,8 +194,7 @@ public class PlayScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        world.dispose();
     }
-
 
 }

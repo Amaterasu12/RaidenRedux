@@ -7,6 +7,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -28,8 +29,8 @@ public class Manager {
 
     public static Animation playerShipAnimation;
     public static Array<TextureRegion> playerShipFrames;
-    public static Texture phasor01;
-    public static Texture phasor02;
+    public static Sprite phasor01;
+    public static Sprite phasor02;
 
     public static Sound phasorSound01;
     public static void create(){
@@ -62,8 +63,9 @@ public class Manager {
             playerShipFrames.add(new TextureRegion(manager.get("sprites.txt", TextureAtlas.class).findRegion("playerShip"), i*64, 0, 64, 64));
         playerShipAnimation = new Animation(0.1f, playerShipFrames);
         playerShipAnimation.setPlayMode(Animation.PlayMode.LOOP);
-        phasor01 = manager.get("laserRed06.png");
-        phasor02 = manager.get("laserGreen04.png");
+        phasor01 = new Sprite(manager.get("laserRed06.png", Texture.class));
+        phasor02 = new Sprite(manager.get("laserGreen04.png", Texture.class));
+
 
         phasorSound01 = manager.get("sfx_laser1.ogg", Sound.class);
     }
