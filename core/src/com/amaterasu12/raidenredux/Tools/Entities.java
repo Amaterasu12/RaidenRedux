@@ -9,7 +9,9 @@ import com.amaterasu12.raidenredux.Components.RenderableComponent;
 import com.amaterasu12.raidenredux.Components.PositionComponent;
 import com.amaterasu12.raidenredux.Components.VelocityComponent;
 import com.amaterasu12.raidenredux.RaidenRedux;
+import com.amaterasu12.raidenredux.Systems.RenderingSystem;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -25,8 +27,6 @@ public class Entities {
     public static final short ENEMY_BITS = 2;
     public static final short PLAYER_PROJECTILE_BITS = 4;
     public static final short ENEMY_PROJECTILE_BITS = 8;
-    public static final int DYNAMIC_BOD = 1;
-    public static final int KINEMATIC_BOD = 2;
 
 
     public static Entity createPlayer() {
@@ -40,31 +40,13 @@ public class Entities {
 
         CircleShape circle = new CircleShape();
         float textureSize = Manager.playerShipAnimation.getKeyFrame(0.1f).getRegionX();
-        circle.setRadius(textureSize / 5);
-        BodyComponent bodyComponent = new BodyComponent(circle, playerPosition.x, playerPosition.y + textureSize/16, PLAYER_BITS, 0, playerShip, DYNAMIC_BOD, false);
-        playerShip.add(bodyComponent);
+        circle.setRadius(textureSize/5);
+        playerShip.add(new BodyComponent(circle, playerPosition.x, playerPosition.y + textureSize/16, PLAYER_BITS, 0));
         circle.dispose();
 
-        bodyComponent.body.setActive(true);
         playerShip.add(new ActiveComponent());
 
         return playerShip;
-    }
-
-    public static Entity createShip(float xPos, float yPos, int health, RenderableComponent render, int size) {
-        Entity ship = new Entity();
-        PositionComponent shipPosition = new PositionComponent(xPos, yPos, 1.9f);
-        ship.add(shipPosition);
-        ship.add(new VelocityComponent());
-        ship.add(new HealthComponent(health));
-        ship.add(render);
-
-        CircleShape circle = new CircleShape();
-        circle.setRadius(size / 2.5f);
-        ship.add(new BodyComponent(circle, shipPosition.x, shipPosition.y, ENEMY_BITS, 0, ship, KINEMATIC_BOD, false));
-        circle.dispose();
-
-        return ship;
     }
 
     public static Entity createBullet(PROJECTILE_TYPE type, float xPos, float yPos, float zPos, float xVel, float yVel){
@@ -74,27 +56,25 @@ public class Entities {
         bullet.add(velocity);
         bullet.add(new HealthComponent(1));
         bullet.add(new ProjectileComponent(type));
-        //body and sprite
         switch (type){
             case PLAYER_PHASOR:
                 Manager.phasorSound01.play(Manager.SOUND_VOLUME / 20);
-                Sprite sprite = Manager.phasorRed06;
+                Sprite sprite = Manager.phasor01;
                 bullet.add(new RenderableComponent(sprite));
-                float spriteSizeX = Manager.phasorRed06.getWidth();
-                float spriteSizeY = Manager.phasorRed06.getHeight();
+                float spriteSizeX = Manager.phasor01.getWidth();
+                float spriteSizeY = Manager.phasor01.getHeight();
 //                CircleShape circleShape = new CircleShape();
 //                circleShape.setRadius(Math.min(spriteSizeX, spriteSizeY) / 2);
 //                bullet.add(new BodyComponent(circleShape, xPos + spriteSizeX*xVel/velocity.getMagnitude()/3, yPos + spriteSizeY*yVel/velocity.getMagnitude()/3, PLAYER_PROJECTILE_BITS, 0));
 //                circleShape.dispose();
                 PolygonShape polygonShape = new PolygonShape();
-                polygonShape.setAsBox(spriteSizeX / 2, spriteSizeY / 2);
-                BodyComponent bodyComponent = new BodyComponent(polygonShape, xPos, yPos, PLAYER_PROJECTILE_BITS, 0, bullet, DYNAMIC_BOD, false);
-                bullet.add(bodyComponent);
-                bodyComponent.body.setActive(true);
+                polygonShape.setAsBox(spriteSizeX/2, spriteSizeY/2);
+                bullet.add(new BodyComponent(polygonShape, xPos, yPos, PLAYER_PROJECTILE_BITS, 0));
                 polygonShape.dispose();
+                bullet.add(new PlayerComponent());
                 break;
             default:
-                bullet.add(new RenderableComponent(Manager.phasorGreen04));
+                bullet.add(new RenderableComponent(Manager.phasor02));
         }
         bullet.add(new ActiveComponent());
         return bullet;
