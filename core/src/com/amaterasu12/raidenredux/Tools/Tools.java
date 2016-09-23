@@ -1,7 +1,6 @@
 package com.amaterasu12.raidenredux.Tools;
 
 import com.amaterasu12.raidenredux.Components.PositionComponent;
-import com.amaterasu12.raidenredux.Components.VelocityComponent;
 import com.amaterasu12.raidenredux.RaidenRedux;
 
 /**
@@ -26,23 +25,5 @@ public class Tools {
             return DIRECTION.UP;
         else
             return DIRECTION.NONE;
-    }
-
-    public static float getRotationAngle(VelocityComponent velocity){
-        float angle = 0;
-        if(velocity.x == 0){
-            angle = 0;
-        }
-        else if(velocity.y == 0){
-            if(velocity.x == 0)
-                angle = 0;
-            else if(velocity.x > 0)
-                angle = 90;
-            else
-                angle = 270;
-        }
-        else
-            angle = -180*(float)(Math.atan2(velocity.x, velocity.y)/Math.PI);
-        return angle*1.1f;
     }
 }

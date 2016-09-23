@@ -16,11 +16,4 @@ public class VelocityComponent implements Component {
         this.x = x;
         this.y = y;
     }
-
-    public float getMagnitude(){
-        double mag = x*x+y*y;
-        if(mag == 0)
-            return 1;
-        return (float)Math.sqrt(mag);
-    }
 }
