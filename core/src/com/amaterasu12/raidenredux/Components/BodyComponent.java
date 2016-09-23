@@ -3,7 +3,6 @@ package com.amaterasu12.raidenredux.Components;
 import com.amaterasu12.raidenredux.Screens.PlayScreen;
 import com.amaterasu12.raidenredux.Tools.Entities;
 import com.badlogic.ashley.core.Component;
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -15,17 +14,13 @@ import com.badlogic.gdx.physics.box2d.Shape;
 public class BodyComponent implements Component {
     public Body body;
 
-    public BodyComponent(Shape shape, float x, float y, short bit, float angle, Entity entity, int bodyType, boolean sensor){
+    public BodyComponent(Shape shape, float x, float y, short bit, float angle){
         BodyDef bodyDef = new BodyDef();
-        if(bodyType == Entities.DYNAMIC_BOD)
-            bodyDef.type = BodyDef.BodyType.DynamicBody;
-        else if(bodyType == Entities.KINEMATIC_BOD)
-            bodyDef.type = BodyDef.BodyType.KinematicBody;
+        bodyDef.type = BodyDef.BodyType.KinematicBody;
         bodyDef.position.set(x, y);
 
         body = PlayScreen.world.createBody(bodyDef);
         body.setTransform(x, y, angle);
-
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -42,9 +37,8 @@ public class BodyComponent implements Component {
         else if(bit == Entities.PLAYER_PROJECTILE_BITS) {
             fixtureDef.filter.maskBits = Entities.ENEMY_BITS;
         }
-        fixtureDef.isSensor = sensor;
+        fixtureDef.isSensor = true;
 
-        body.createFixture(fixtureDef).setUserData(entity);
-        body.setActive(false);
+        body.createFixture(fixtureDef);
     }
 }

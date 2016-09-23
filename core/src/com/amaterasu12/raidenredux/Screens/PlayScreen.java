@@ -1,12 +1,8 @@
 package com.amaterasu12.raidenredux.Screens;
 
-import com.amaterasu12.raidenredux.Components.ActiveComponent;
-import com.amaterasu12.raidenredux.Components.BodyComponent;
 import com.amaterasu12.raidenredux.Components.PositionComponent;
-import com.amaterasu12.raidenredux.Components.RenderableComponent;
 import com.amaterasu12.raidenredux.Components.VelocityComponent;
 import com.amaterasu12.raidenredux.Systems.CleanupSystem;
-import com.amaterasu12.raidenredux.Tools.CollisionDetect;
 import com.amaterasu12.raidenredux.Tools.Entities;
 import com.amaterasu12.raidenredux.RaidenRedux;
 import com.amaterasu12.raidenredux.Systems.MovementSystem;
@@ -54,10 +50,7 @@ public class PlayScreen implements Screen {
 
 
     //player entity
-    private Entity playerShip;
-
-    //test ship
-    private Entity testEnemy;
+    public Entity playerShip;
 
     public PlayScreen(RaidenRedux gam) {
         this.game = gam;
@@ -70,7 +63,6 @@ public class PlayScreen implements Screen {
         movementSystem = new MovementSystem();
         cleanupSystem = new CleanupSystem();
 
-
         //add systems
         RaidenRedux.engine.addSystem(renderingSystem);
         RaidenRedux.engine.addSystem(movementSystem);
@@ -78,7 +70,6 @@ public class PlayScreen implements Screen {
 
         //box2d
         world = new World(new Vector2(0, 0), true);
-        world.setContactListener(new CollisionDetect());
 
         //create ships
         playerShip = Entities.createPlayer();
@@ -86,11 +77,6 @@ public class PlayScreen implements Screen {
         playerVel = playerShip.getComponent(VelocityComponent.class);
         playerPos = playerShip.getComponent(PositionComponent.class);
 
-        RenderableComponent enemySprite = new RenderableComponent(Manager.enemyBlack4);
-        testEnemy = Entities.createShip(240, 650, 50, enemySprite, enemySprite.sprite.getRegionWidth());
-        testEnemy.getComponent(BodyComponent.class).body.setActive(true);
-        testEnemy.add(new ActiveComponent());
-        RaidenRedux.engine.addEntity(testEnemy);
     }
 
     @Override
@@ -109,6 +95,10 @@ public class PlayScreen implements Screen {
         if(bulletElapsedTime >= PLAYER_BULLET_FREQUENCY){
             RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x-10, playerPos.y+10, Entities.PLAYER_BULLET_Z, 0, PLAYER_BULLET_VELOCITY));
             RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x+10, playerPos.y+10, Entities.PLAYER_BULLET_Z, 0, PLAYER_BULLET_VELOCITY));
+            RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x-25, playerPos.y+10, Entities.PLAYER_BULLET_Z, -150, PLAYER_BULLET_VELOCITY));
+            RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x+25, playerPos.y+10, Entities.PLAYER_BULLET_Z, 150, PLAYER_BULLET_VELOCITY));
+            RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x-40, playerPos.y+10, Entities.PLAYER_BULLET_Z, -300, PLAYER_BULLET_VELOCITY));
+            RaidenRedux.engine.addEntity(Entities.createBullet(Entities.PROJECTILE_TYPE.PLAYER_PHASOR, playerPos.x+40, playerPos.y+10, Entities.PLAYER_BULLET_Z, 300, PLAYER_BULLET_VELOCITY));
             bulletElapsedTime = 0;
         }
 
