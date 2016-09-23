@@ -1,3 +1,2 @@
-# RaidenRedux
-This is a spare time project, just a small Raiden-esque scrolling shooter for personal development.
-Should work on desktop and mobile.
+# Raiden Engine
+This is a project designed to test entity component systems. This engine processes every element on screen as an entity with components. All logic is done using component systems.
